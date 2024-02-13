@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Správa skladových zásob</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            padding: 5px;
+            margin-right: 5px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #255d83;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #757ea4;
+        }
+
+        #products-list {
+            margin-top: 20px;
+        }
+
+        .product {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .product:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Správa skladových zásob</h1>
+        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-box-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.004-.001.274-.11a.75.75 0 0 1 .558 0l.274.11.004.001zm-1.374.527L8 5.962 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339Z"/>
+          </svg>
+        <div>
+            <label for="quantity">Zadejte množství:</label>
+            <input type="number" id="quantity" min="0" step="1">
+            <button onclick="filtrujPodleMnožství()">Filtrovat</button>
+        </div>
+        <div id="products-list"></div>
+        <div>
+            <button onclick="najítNejdražší()">Nejdražší</button>
+            <button onclick="vypočítejCelkovouCenu()">Celková cena</button>
+            <button onclick="aktualizujZásoby()">Aktualizace zásob</button>
+        </div>
+    </div>
+
+    <script>
+        const produkty = [
+            { název: "Tužka", cena: 10, sklad: 100 },
+            { název: "Sešit", cena: 20, sklad: 150 },
+            { název: "Batoh", cena: 500, sklad: 50 },
+            { název: "Pravítko", cena: 30, sklad: 75 },
+            { název: "Pero", cena: 40, sklad: 200 },
+            { název: "Kalkulačka", cena: 200, sklad: 30 },
+            { název: "Barvy", cena: 150, sklad: 80 },
+            { název: "Štětce", cena: 60, sklad: 120 },
+            { název: "Ležidlo", cena: 300, sklad: 40 },
+            { název: "Mapa světa", cena: 180, sklad: 60 }
+        ];
+
+        function zobrazZboží(seznamZboží) {
+            const seznamZbožíElement = document.getElementById('products-list');
+            seznamZbožíElement.innerHTML = '';
+            seznamZboží.forEach((zboží, index) => {
+                const zbožíDiv = document.createElement('div');
+                zbožíDiv.classList.add('product');
+                zbožíDiv.textContent = `${zboží.název} - ${zboží.cena} Kč - ${zboží.sklad} kusů`;
+                const inputElement = document.createElement('input');
+                inputElement.setAttribute('type', 'number');
+                inputElement.setAttribute('min', '0');
+                inputElement.setAttribute('step', '1');
+                inputElement.setAttribute('data-index', index);
+                inputElement.value = zboží.sklad;
+                zbožíDiv.appendChild(inputElement);
+                seznamZbožíElement.appendChild(zbožíDiv);
+            });
+        }
+
+        function najítNejdražší() {
+            const nejdražšíZboží = produkty.reduce((předchozí, aktuální) => (předchozí.cena > aktuální.cena) ? předchozí : aktuální);
+            alert(`Nejdražší zboží: ${nejdražšíZboží.název} - ${nejdražšíZboží.cena} Kč`);
+        }
+
+        function vypočítejCelkovouCenu() {
+            const celkováCena = produkty.reduce((součet, aktuální) => součet + (aktuální.cena * aktuální.sklad), 0);
+            alert(`Celková cena zásob: ${celkováCena} Kč`);
+        }
+
+        function filtrujPodleMnožství() {
+            const hraniceMnožství = parseInt(document.getElementById('quantity').value);
+            const filtrovanéZboží = produkty.filter(zboží => zboží.sklad < hraniceMnožství);
+            zobrazZboží(filtrovanéZboží);
+        }
+
+        function aktualizujZásoby() {
+            const inputy = document.querySelectorAll('#products-list input');
+            inputy.forEach(input => {
+                const index = parseInt(input.getAttribute('data-index'));
+                produkty[index].sklad = parseInt(input.value);
+            });
+            zobrazZboží(produkty);
+        }
+
+        zobrazZboží(produkty);
+    </script>
+</body>
+</html>
